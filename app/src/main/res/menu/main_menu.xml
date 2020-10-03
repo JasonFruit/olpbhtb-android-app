@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/search"
+        android:title="Search" />
+    <item android:id="@+id/first-lines"
+        android:title="First lines" />
+    <item android:id="@+id/authors"
+        android:title="Authors" />
+    <item android:id="@+id/meters"
+        android:title="Meters" />
+    <item android:id="@+id/categories"
+        android:title="Categories"></item>
+    <item android:id="@+id/about"
+        android:title="About" />
+</menu>

@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "Old-Line Primitive Baptist Hymn and Tune Book"
