@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
                 cb.putString("id-type", "category");
                 catIntent.putExtras(cb);
                 startActivity(catIntent);
+                return true;
+            case R.id.search:
+                Intent searchIntent = new Intent(this, SearchActivity.class);
+                startActivity(searchIntent);
                 return true;
         }
         return false;
