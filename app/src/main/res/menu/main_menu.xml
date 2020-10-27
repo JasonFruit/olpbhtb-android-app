@@ -9,7 +9,9 @@
     <item android:id="@+id/meters"
         android:title="Meters" />
     <item android:id="@+id/categories"
-        android:title="Categories"></item>
+        android:title="Categories" />
+    <item android:id="@+id/tunes"
+        android:title="Tunes" />
     <item android:id="@+id/about"
         android:title="About" />
 </menu>

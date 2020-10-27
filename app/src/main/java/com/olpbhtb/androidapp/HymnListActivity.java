@@ -13,33 +13,6 @@ import android.widget.Toast;
 
 import java.util.List;
 
-class HymnListButtonHandler implements View.OnClickListener {
-
-    private DatabaseAccess db;
-    private HymnListActivity ctx;
-
-    @Override
-    public void onClick(View v) {
-        Button btn = (Button)v;
-        int hymnId = btn.getId();
-
-        TextView tv = ctx.findViewById(R.id.hymnListHeader);
-
-        Intent intent = new Intent(ctx, HymnViewActivity.class);
-        Bundle b = new Bundle();
-        b.putInt("hymnId", hymnId);
-        intent.putExtras(b);
-        ctx.startActivity(intent);
-
-    }
-
-    public HymnListButtonHandler(HymnListActivity ctx, DatabaseAccess db) {
-        this.ctx = ctx;
-
-        this.db = db;
-    }
-}
-
 
 public class HymnListActivity extends AppCompatActivity {
 
@@ -52,9 +25,11 @@ public class HymnListActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         int id = 0;
-        String idType = "";
+        String idType = " ";
         if(b != null) {
-            id = b.getInt("id");
+            if (b.containsKey("id")) {
+                id = b.getInt("id");
+            }
             idType = b.getString("id-type");
         }
 
@@ -62,6 +37,12 @@ public class HymnListActivity extends AppCompatActivity {
         db.open();
 
         switch (idType) {
+            case "words-search":
+                this.Hymns = db.SearchForWords(b.getString("q"));
+                break;
+            case "phrase-search":
+                this.Hymns = db.SearchForPhrase(b.getString("q"));
+                break;
             case "author":
                 this.Hymns = db.getHymns(new HymnAuthor(id, "Dummy name"));
                 break;
@@ -70,6 +51,9 @@ public class HymnListActivity extends AppCompatActivity {
                 break;
             case "category":
                 this.Hymns = db.getHymns(new Category(id, "Dummy name"));
+                break;
+            case "tune":
+                this.Hymns = db.getHymns(new Tune(id, "Dummy name"));
                 break;
             case "first-lines":
                 this.Hymns = db.getHymns();

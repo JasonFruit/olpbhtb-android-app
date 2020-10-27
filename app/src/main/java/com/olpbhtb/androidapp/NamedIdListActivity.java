@@ -11,30 +11,6 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-class NamedIdButtonHandler implements View.OnClickListener {
-
-    private DatabaseAccess db;
-    private NamedIdListActivity ctx;
-
-    @Override
-    public void onClick(View v) {
-        Button btn = (Button)v;
-        int authorId = btn.getId();
-
-        Intent intent = new Intent(ctx, HymnListActivity.class);
-        Bundle b = new Bundle();
-        b.putInt("id", authorId);
-        b.putString("id-type", ctx.IdType);
-        intent.putExtras(b);
-        ctx.startActivity(intent);
-    }
-
-    public NamedIdButtonHandler(NamedIdListActivity ctx, DatabaseAccess db) {
-        this.ctx = ctx;
-        this.db = db;
-    }
-}
-
 public class NamedIdListActivity extends AppCompatActivity {
 
     private List<NamedIdable> authors;
@@ -69,6 +45,11 @@ public class NamedIdListActivity extends AppCompatActivity {
             case "category":
                 for (Category cat: db.getCategories()) {
                     items.add(cat);
+                }
+                break;
+            case "tune":
+                for (Tune t: db.getTunes()) {
+                    items.add(t);
                 }
                 break;
         }

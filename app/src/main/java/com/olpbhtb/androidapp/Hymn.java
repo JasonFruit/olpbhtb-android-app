@@ -12,7 +12,7 @@ public class Hymn {
 
         for (Stanza s: Stanzas) {
             out += s.toString();
-            out += "\n\n";
+            out += "\n";
         }
 
         return out;

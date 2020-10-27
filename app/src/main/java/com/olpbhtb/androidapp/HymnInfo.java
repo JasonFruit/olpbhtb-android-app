@@ -18,7 +18,12 @@ public class HymnInfo {
     }
 
     public String imageFilename() {
-        return this.TuneName.replace(" ", "-").toLowerCase() + ".gif";
+
+        String out = this.TuneName.replace(" ", "-").toLowerCase();
+        for (Character c: ".'1234567890".toCharArray()) {
+            out = out.replace(c.toString(), "");
+        }
+        return out + ".gif";
     }
 
     public HymnInfo(int id,

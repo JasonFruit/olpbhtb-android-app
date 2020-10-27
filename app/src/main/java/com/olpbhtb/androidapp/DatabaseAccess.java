@@ -12,6 +12,27 @@ public class DatabaseAccess {
     private SQLiteOpenHelper openHelper;
     private SQLiteDatabase database;
     private static DatabaseAccess instance;
+    private static String hymnInfoSelectStart = "select h.id, " +
+            "olpbhtb_number, " +
+            "meter_id, " +
+            "m.description as meter_dsc, " +
+            "author_id, " +
+            "a.name as author_name, " +
+            "category_id, " +
+            "c.name as category_name, " +
+            "t.name as tune_name, " +
+            "fl.first_line " +
+            "from hymn h " +
+            "inner join meter m " +
+            "on h.meter_id = m.id " +
+            "inner join author a " +
+            "on h.author_id = a.id " +
+            "inner join category c " +
+            "on h.category_id = c.id " +
+            "inner join first_line fl " +
+            "on h.id = fl.id " +
+            "inner join tune t " +
+            "on h.tune_id = t.id ";
 
     /**
      * Private constructor to aboid object creation from outside classes.
@@ -58,20 +79,41 @@ public class DatabaseAccess {
         String[] words = q.split("\\s");
         List<String> queryWords = new ArrayList<>();
 
-        String sql = "select h.id, olpbhtb_number, meter_id, m.description as meter_dsc, author_id, a.name as author_name, category_id, c.name as category_name, tune_name, fl.first_line from hymn h inner join meter m on h.meter_id = m.id inner join author a on h.author_id = a.id inner join category c on h.category_id = c.id inner join first_line fl on h.id = fl.id where h.id in (select hymn_id from line where 1 = 1 ";
+        String sql = hymnInfoSelectStart + "where 1 = 1 ";
 
         if (words.length == 0) {
             return new ArrayList<>();
         } else {
             for (String word: words) {
-                sql += "and content like ? ";
+                sql += "and h.id in (select hymn_id from line where content like ?) ";
                 queryWords.add("%" + word + "%");
             }
-            sql += ") order by sortable";
+            sql += " order by sortable";
         }
 
         Cursor cur = database.rawQuery(sql, queryWords.toArray(new String[]{}));
         return this.hymnInfoList(cur);
+    }
+
+    public List<HymnInfo> SearchForPhrase(String q) {
+        String cleanLineSql = "lower(replace(replace(replace(replace(replace(content, ',', ''), '-', ' '), ';', ''), '.', ''), ':', ''))";
+        q = q.replace(",", "").replace(".", "").replace(";", "").replace("-", " ").replace(":", "").replace("%", "").toLowerCase();
+        String sql = hymnInfoSelectStart + "where h.id in (select hymn_id from line where " + cleanLineSql + " like ?)";
+        Cursor cur = database.rawQuery(sql, new String[]{"%" + q + "%"});
+        return this.hymnInfoList(cur);
+    }
+
+    public List<Tune> getTunes() {
+        List<Tune> tunes = new ArrayList<>();
+        Cursor cur = database.rawQuery("select id, name from tune order by name", null);
+        cur.moveToFirst();
+        while (!cur.isAfterLast()) {
+            tunes.add(new Tune(cur.getInt(0),
+                    cur.getString(1)));
+            cur.moveToNext();
+        }
+        cur.close();
+        return tunes;
     }
 
     public List<HymnAuthor> getAuthors() {
@@ -137,25 +179,31 @@ public class DatabaseAccess {
     public List<HymnInfo> getHymns(HymnAuthor author) {
 
         String[] args = new String[]{String.valueOf(author.Id)};
-        Cursor cur = database.rawQuery("select h.id, olpbhtb_number, meter_id, m.description as meter_dsc, author_id, a.name as author_name, category_id, c.name as category_name, tune_name, fl.first_line from hymn h inner join meter m on h.meter_id = m.id inner join author a on h.author_id = a.id inner join category c on h.category_id = c.id inner join first_line fl on h.id = fl.id where author_id = ? order by sortable", args);
+        Cursor cur = database.rawQuery(hymnInfoSelectStart + "where author_id = ? order by sortable", args);
         return hymnInfoList(cur);
     }
 
     public List<HymnInfo> getHymns(Meter meter) {
         String[] args = new String[]{String.valueOf(meter.Id)};
-        Cursor cur = database.rawQuery("select h.id, olpbhtb_number, meter_id, m.description as meter_dsc, author_id, a.name as author_name, category_id, c.name as category_name, tune_name, fl.first_line from hymn h inner join meter m on h.meter_id = m.id inner join author a on h.author_id = a.id inner join category c on h.category_id = c.id inner join first_line fl on h.id = fl.id where meter_id = ? order by sortable", args);
+        Cursor cur = database.rawQuery(hymnInfoSelectStart + "where meter_id = ? order by sortable", args);
         return hymnInfoList(cur);
     }
 
     public List<HymnInfo> getHymns(Category cat) {
         String[] args = new String[]{String.valueOf(cat.Id)};
-        Cursor cur = database.rawQuery("select h.id, olpbhtb_number, meter_id, m.description as meter_dsc, author_id, a.name as author_name, category_id, c.name as category_name, tune_name, fl.first_line from hymn h inner join meter m on h.meter_id = m.id inner join author a on h.author_id = a.id inner join category c on h.category_id = c.id inner join first_line fl on h.id = fl.id where category_id = ? order by sortable", args);
+        Cursor cur = database.rawQuery(hymnInfoSelectStart + "where category_id = ? order by sortable", args);
+        return hymnInfoList(cur);
+    }
+
+    public List<HymnInfo> getHymns(Tune t) {
+        String[] args = new String[]{String.valueOf(t.Id)};
+        Cursor cur = database.rawQuery(hymnInfoSelectStart + "where tune_id = ? order by sortable", args);
         return hymnInfoList(cur);
     }
 
     public List<HymnInfo> getHymns() {
         String[] args = new String[]{};
-        Cursor cur = database.rawQuery("select h.id, olpbhtb_number, meter_id, m.description as meter_dsc, author_id, a.name as author_name, category_id, c.name as category_name, tune_name, fl.first_line from hymn h inner join meter m on h.meter_id = m.id inner join author a on h.author_id = a.id inner join category c on h.category_id = c.id inner join first_line fl on h.id = fl.id order by sortable", args);
+        Cursor cur = database.rawQuery(hymnInfoSelectStart + "order by sortable", args);
         return hymnInfoList(cur);
     }
 
@@ -164,7 +212,7 @@ public class DatabaseAccess {
         String[] args = new String[]{String.valueOf(id)};
 
         // get the header info
-        Cursor cur = database.rawQuery("select h.id, olpbhtb_number, meter_id, m.description as meter_dsc, author_id, a.name as author_name, category_id, c.name as category_name, tune_name, fl.first_line from hymn h inner join meter m on h.meter_id = m.id inner join author a on h.author_id = a.id inner join category c on h.category_id = c.id inner join first_line fl on h.id = fl.id where h.id = ?", args);
+        Cursor cur = database.rawQuery(hymnInfoSelectStart + "where h.id = ?", args);
         HymnInfo info = hymnInfoList(cur).get(0); //there can only be one
         cur.close();
 

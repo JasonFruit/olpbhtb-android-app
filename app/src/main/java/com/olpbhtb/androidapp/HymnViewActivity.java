@@ -5,14 +5,21 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -117,8 +124,9 @@ public class HymnViewActivity extends AppCompatActivity {
 
         try
         {
+            String imgFn = hymn.Info.imageFilename();
             // get input stream
-            InputStream ims = getAssets().open("tunes/" + hymn.Info.imageFilename());
+            InputStream ims = getAssets().open("tunes/" + imgFn);
             // load image as Drawable
             Drawable d = Drawable.createFromStream(ims, null);
             // set image to ImageView
@@ -127,7 +135,7 @@ public class HymnViewActivity extends AppCompatActivity {
         }
         catch(IOException ex)
         {
-            return;
+            iv.setContentDescription("Missing tune image: " + hymn.Info.TuneName);
         }
 
         TextView header = findViewById(R.id.hymn_header);
@@ -135,6 +143,23 @@ public class HymnViewActivity extends AppCompatActivity {
 
         TextView tv = findViewById(R.id.hymn_text);
         tv.setText(hymn.toString());
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent shareIntent =   new Intent(android.content.Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT,"Insert Subject here");
+                shareIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+                        "Hymn #" +
+                        hymn.Info.toString() + "\n" +
+                        hymn.toString() +
+                        "\n\n(From the Old-Line Primitive Baptist Hymn and Tune Book)");
+                startActivity(Intent.createChooser(shareIntent, "Share via"));
+            }
+        });
+
     }
 
     @Override

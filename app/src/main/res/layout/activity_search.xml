@@ -11,7 +11,7 @@
         android:layout_height="729dp"
         android:layout_marginStart="1dp"
         android:layout_marginLeft="1dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="@dimen/app_bar_height"
         android:layout_marginEnd="1dp"
         android:layout_marginRight="1dp"
         android:layout_marginBottom="1dp"
@@ -22,14 +22,13 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/q"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Search:"
             android:textSize="24sp" />
 
         <EditText
-            android:id="@+id/editTextTextPersonName"
+            android:id="@+id/q"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -47,6 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
+                android:onClick="PhraseSearchOnClick"
                 android:text="Search for phrase" />
 
             <Button
@@ -54,6 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
+                android:onClick="WordsSearchOnClick"
                 android:text="Search for words" />
         </LinearLayout>
     </LinearLayout>
